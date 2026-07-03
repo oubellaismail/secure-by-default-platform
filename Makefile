@@ -60,3 +60,28 @@ validate: ## Run the validation suite (prove controls block threats)
 lint: ## Lint manifests and Helm charts
 	helm lint paved-road/helm-chart
 	kubectl apply --dry-run=client -R -f platform/ >/dev/null
+
+## ---- Reports --------------------------------------------------------------
+
+# Compile a Markdown report to PDF. Usage: make report FILE=reports/01-week-1-....md
+FILE ?=
+.PHONY: report
+report: ## Compile a report MD to PDF (FILE=reports/<name>.md)
+	@test -n "$(FILE)" || { echo "Usage: make report FILE=reports/<name>.md"; exit 1; }
+	@test -f "$(FILE)" || { echo "No such file: $(FILE)"; exit 1; }
+	pandoc "$(FILE)" -o "$(FILE:.md=.pdf)" \
+		--pdf-engine=xelatex \
+		-V geometry:margin=1in \
+		-V fontsize=11pt \
+		-V colorlinks=true \
+		-V linkcolor=blue
+	@echo "Wrote $(FILE:.md=.pdf)"
+
+.PHONY: reports
+reports: ## Compile every report under reports/ to PDF
+	@for f in reports/*.md; do \
+		[ "$$f" = "reports/README.md" ] && continue; \
+		[ "$$f" = "reports/TEMPLATE.md" ] && continue; \
+		echo "==> $$f"; \
+		$(MAKE) --no-print-directory report FILE="$$f"; \
+	done

@@ -56,3 +56,6 @@ semgrep-results.*
 kind-config.local.yaml
 tmp/
 scratch/
+
+# Generated reports — track the Markdown source, not the PDF build artifact
+reports/*.pdf
