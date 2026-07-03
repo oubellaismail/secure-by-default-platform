@@ -1,5 +1,5 @@
 # Multi-stage, non-root, minimal — the image is itself an artifact we scan and sign.
-FROM python:3.12-slim AS base
+FROM python:3.14-slim AS base
 
 # Non-root by default (least privilege; Kyverno will also enforce this at admission).
 RUN useradd --create-home --uid 10001 appuser
