@@ -1,0 +1,55 @@
+# Baseline workload hygiene enforced at admission: no privilege, no root, resource limits.
+# Complements verify-image-signature.yaml — signed AND well-behaved, or it does not run.
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: pod-security-baseline
+  annotations:
+    policies.kyverno.io/title: Pod security baseline
+    policies.kyverno.io/category: Pod Security
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: deny-privileged
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+      validate:
+        message: "Privileged containers are not allowed."
+        pattern:
+          spec:
+            =(securityContext):
+              =(privileged): "false"
+            containers:
+              - =(securityContext):
+                  =(privileged): "false"
+                  =(allowPrivilegeEscalation): "false"
+
+    - name: require-run-as-nonroot
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+      validate:
+        message: "Containers must run as non-root (runAsNonRoot: true)."
+        pattern:
+          spec:
+            =(securityContext):
+              runAsNonRoot: true
+
+    - name: require-resource-limits
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+      validate:
+        message: "CPU and memory limits are required on every container."
+        pattern:
+          spec:
+            containers:
+              - resources:
+                  limits:
+                    memory: "?*"
+                    cpu: "?*"

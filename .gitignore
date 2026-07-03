@@ -1,0 +1,58 @@
+# Secrets & credentials — NEVER commit
+*.pem
+*.key
+*.crt
+!**/testdata/*.crt
+cosign.key
+cosign.pub.local
+*.tfvars
+!example.tfvars
+.env
+.env.*
+!.env.example
+kubeconfig
+*.kubeconfig
+secrets.yaml
+!**/secrets.example.yaml
+
+# Terraform
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+crash.log
+override.tf
+override.tf.json
+
+# Helm
+charts/*.tgz
+paved-road/helm-chart/charts/
+
+# Build / language artifacts
+node_modules/
+target/
+build/
+dist/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# SBOM / scan outputs (regenerated, not tracked)
+*.sbom.json
+sbom-*.json
+trivy-results.*
+gitleaks-report.json
+semgrep-results.*
+
+# OS / editor
+.DS_Store
+*.swp
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Local cluster / tooling
+kind-config.local.yaml
+tmp/
+scratch/

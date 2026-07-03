@@ -1,0 +1,38 @@
+# The second load-bearing checkpoint: the cluster refuses to run unsigned images.
+# Verifies a Cosign keyless (OIDC/Fulcio) signature produced by the secure-ci pipeline.
+#
+# Set `validationFailureAction: Audit` first to observe, then flip to Enforce once the
+# signing chain is confirmed (Week 5).
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: verify-image-signature
+  annotations:
+    policies.kyverno.io/title: Verify image signatures
+    policies.kyverno.io/category: Supply Chain Security
+    policies.kyverno.io/description: >-
+      Blocks admission of images from the platform registry that do not carry a valid
+      Cosign signature from the trusted CI identity.
+spec:
+  validationFailureAction: Enforce
+  webhookTimeoutSeconds: 30
+  failurePolicy: Fail
+  rules:
+    - name: verify-signed-by-ci
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+      verifyImages:
+        - imageReferences:
+            - "ghcr.io/oubellaismail/*"
+          failureAction: Enforce
+          attestors:
+            - count: 1
+              entries:
+                - keyless:
+                    # The CI workflow identity that is allowed to sign.
+                    subject: "https://github.com/oubellaismail/secure-by-default-platform/.github/workflows/secure-ci.yml@refs/heads/main"
+                    issuer: "https://token.actions.githubusercontent.com"
+                    rekor:
+                      url: https://rekor.sigstore.dev

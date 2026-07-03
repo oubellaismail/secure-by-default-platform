@@ -1,0 +1,16 @@
+# Local kind cluster for the POC. One control-plane + one worker is enough to
+# demonstrate admission, GitOps, and network policy. Tear down when idle.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: sbdp
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      - containerPort: 30080   # expose the sample app / ingress locally
+        hostPort: 8081
+        protocol: TCP
+  - role: worker
+# Note: Cilium (Week 6) may require disabling the default CNI here:
+#   networking:
+#     disableDefaultCNI: true
+# Enable that only when starting the Cilium work, not before.

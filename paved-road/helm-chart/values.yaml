@@ -1,0 +1,34 @@
+# Defaults are the SECURE defaults. A consumer overrides image and name; the security
+# posture is inherited, not configured. Loosening these should be hard and explicit.
+image:
+  repository: ghcr.io/oubellaismail/sbdp-sample-app
+  tag: ""            # required override; digest-pinned in the real flow
+  pullPolicy: IfNotPresent
+
+replicaCount: 2
+
+# Security context — matches what Kyverno enforces. Do not weaken casually.
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilitiesDrop: ["ALL"]
+  seccompProfile: RuntimeDefault
+
+# Resource limits are required by admission policy — no unlimited workloads.
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 250m
+    memory: 128Mi
+
+service:
+  port: 80
+  targetPort: 8000
+
+probes:
+  path: /healthz
+  port: 8000

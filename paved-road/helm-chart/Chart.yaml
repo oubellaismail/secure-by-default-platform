@@ -1,0 +1,12 @@
+apiVersion: v2
+name: paved-road
+description: Opinionated chart that renders a secure-by-default workload for the platform.
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - security
+  - devsecops
+  - paved-road
+maintainers:
+  - name: Oubella Ismail
